@@ -2027,9 +2027,10 @@ mod.hook.register("script_pre_init", "3u patch companion pre init", function()
   --   end
   -- }
   -- params:add(mft_port_param)
-  mft = midi.connect(1)
-  if mft.name ~= "Midi Fighter Twister" then
-    mft = nil
+  for i = 1, #midi.vports do
+    if midi.vports[i].name == "Midi Fighter Twister" then
+      mft = midi.connect(i)
+    end
   end
 
   -- table of midi cc handlers, hiearchy is ch -> encoder num -> {func = function, state = {}}
@@ -3652,6 +3653,26 @@ function enable_animate(enc, state)
   end
 end
 ----- END MFT LED ANIMATION SYSTEM -----
+
+-- MOD MENU
+local modmenu = include '3u-patch-companion/lib/modmenu/modmenu'
+local mft_conf = require('3u-patch-companion/lib/mftconf/lib/mftconf')
+local menu = modmenu.new("3u_companion_mod_menu", mod.this_name)
+local mod_params = menu.params
+mod_params:add{
+  id="mft_load_config",
+  name="load MFT config",
+  type="binary",
+  behavior="trigger",
+  action=function()
+    for i = 1, #midi.vports do
+      if midi.vports[i].name == "Midi Fighter Twister" then
+        mft_conf.load_conf(midi.connect(i), '/home/we/dust/code/3u-patch-companion/resources/mft-minimal-config.mfs')
+      end
+    end
+  end,
+}
+mod.menu.register(mod.this_name, menu)
 
 debug_3u = true
 function debug_msg(s)

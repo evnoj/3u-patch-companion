@@ -1,0 +1,3 @@
+[submodule "lib/modmenu"]
+	path = lib/modmenu
+	url = https://github.com/evnoj/norns-modmenu
