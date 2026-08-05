@@ -2147,6 +2147,66 @@ mod.hook.register("script_pre_init", "3u patch companion pre init", function()
     end
   end
 
+  local function ratio_to_sensitivity(ratio)
+    local s = 1
+    if ratio <= 0.01 or ratio >= .99 then
+      s = 1
+    elseif ratio <= 0.02 or ratio >= .98 then
+      s = 2
+    else
+      s = 10
+    end
+
+    return s
+  end
+
+  local function symmetry_to_sensitivity(symmetry)
+    local s
+    if symmetry <= -4.8 or symmetry >= 4.8 then
+      s = 0.5
+    elseif symmetry <= -4.5 or symmetry >= 4.5 then
+      s = 1
+    else
+      s = 5
+    end
+
+    return s
+  end
+
+  -- ENC 3, wsyn lpg symmetry
+  mft_handlers[enc_chan][3] = {}
+  mft_handlers[enc_chan][3].state = {
+    sensitivity = symmetry_to_sensitivity(params:get("wsyn_lpg_symmetry"))
+  }
+  mft_handlers[enc_chan][3].func = function(msg)
+    local s = mft_handlers[enc_chan][3].state
+    s.sensitivity = symmetry_to_sensitivity(params:get("wsyn_lpg_symmetry"))
+
+    params:delta('wsyn_lpg_symmetry', msg_delta(msg) * s.sensitivity)
+    p_redraw()
+  end
+
+  table.insert(param_callbacks_3u['wsyn_lpg_symmetry'], function(symmetry)
+    -- local val = 63.5
+    -- val = val + (ratio - 0.5) / 0.5 * 63.5
+
+    -- range 0.01-.99 covers the range up to 4 leds in either direction from the center
+    -- furthest led is only lit when the ratio is at min (0) or max (1)
+    symmetry = (symmetry + 5) / 10
+    local val
+    if symmetry == 0 then
+      val = 0
+    elseif symmetry == 1 then
+      val = 127
+    else
+      val = 63.5 + (symmetry - 0.5) / 0.5 * 52
+      val = math.floor(val + 0.5)
+    end
+
+    mft:cc(3, val, enc_chan)
+    mft:cc(3, val, enc_s_chan)
+  end)
+
   -- ENC 4, txo voice 4 shape
   mft_handlers[enc_chan][4] = {}
   mft_handlers[enc_chan][4].state = {}
