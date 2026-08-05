@@ -69,6 +69,13 @@ side buttons:
   1. reset ansible (txo tr 3 trigger)
   2. bang params 
 
+# wiring
+- crow output 4 to cv in of veils chan, in is wsyn output, changing wsyn fm index (ex. trackball) adjusts VCA down as index increases to maintain perceived volume
+  - veils slider at max, offset min, linear response
+    - can adjust slider for different responses
+- txo tr 3 to ansible reset in
+- txo tr 4 to ansible clock in
+
 # todo
 - [ ] find good txo waveforms, interpolate between them instead of flat scan through values?
 - [ ] more ways of controlling fm ratio

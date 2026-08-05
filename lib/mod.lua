@@ -2498,7 +2498,7 @@ mod.hook.register("script_pre_init", "3u patch companion pre init", function()
         local t = util.time()
 
         if t - s.press_time >= .25 then -- long press
-        else -- short press, trigger envelope
+        else -- short press
           params:set("wsyn_curve", 5)
           params:set("wsyn_ramp", 0)
         end
